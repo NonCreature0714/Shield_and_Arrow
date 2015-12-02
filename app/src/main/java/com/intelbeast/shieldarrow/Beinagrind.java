@@ -14,7 +14,11 @@ public class Beinagrind {
 
     private int attackPosition = 0;
 
+    //TODO: create default constructor
 
+    //TODO: create destructor
+
+    //TODO: create public get and set functions
 
 
 }

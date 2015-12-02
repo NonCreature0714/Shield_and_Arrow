@@ -32,7 +32,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
     private boolean previouslyRunning = false;
 
 
-    private final ShieldAndArrowActivity gameActivity;
+    private ShieldAndArrowActivity gameActivity; //TODO: resolve if this statement needs to be 'final'
 
     private int width;  //Screen width
     private int height; //Screen height
@@ -49,13 +49,47 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
          ************************************************/
 
 
+/****************************
+ *   Private functions      *
+ ****************************/
+
+        // TODO: private update function
+
+        // TODO: private draw function
 
 
-        // Draw
+/****************************
+ *   Public functions       *
+ ****************************/
 
+        // TODO: public touch x
 
+        //TODO: public touch y
 
+        //TODO: public run()
 
+/*******************************/
+/********************************
+ * End of ShieldAndArrowThread  *
+ ********************************/
+/********************************/
     }
 
+//TODO: ShieldAndArrowView() function, NOT class
+  public ShieldAndArrowView(Context context){
+    super(context);
+    getHolder().addCallback(this);
+    this.gameActivity = (ShieldAndArrowActivity) context;
+    _thread = new ShieldAndArrowThread(getHolder(), this);
+    setFocusable(true);
+    setFocusableInTouchMode(true);
+  }
+
+    //TODO: create contructor
+
+    //TODO: create destructor
+
+    //TODO: create override functions
+        //TODO: touch detection
+        //TODO: onPause
 }

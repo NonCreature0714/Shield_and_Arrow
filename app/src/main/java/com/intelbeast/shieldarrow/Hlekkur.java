@@ -29,5 +29,11 @@ public class Hlekkur {
 
     private boolean hlekkurAscend = false;
 
+    //TODO: create constructor
+
+    //TODO: create destructor
+
+    //TODO: create public set and get functions
+
 
 }

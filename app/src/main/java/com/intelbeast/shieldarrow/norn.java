@@ -14,5 +14,11 @@ public class norn {
     private boolean nornHarmed = false;
 
 
+    //TODO: create constructor
+
+    //TODO: create destructor
+
+    //TODO: create public classes for get and set function
+
 
 }

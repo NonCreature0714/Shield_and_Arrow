@@ -14,4 +14,12 @@ public class Skrimsli {
 
     private boolean skrimsliHarmed = false;
 
+    //TODO: create default constructor
+
+    //TODO: create destructor
+
+    //TODO: create public get and set functions
+
+
+
 }
