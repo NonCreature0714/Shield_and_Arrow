@@ -5,35 +5,97 @@ package com.intelbeast.shieldarrow;
  */
 public class Hlekkur {
 
-    private int hlekkurLife = 6;
+    private int FULL_LIFE = 6;
 
-    private boolean hlekkurAlive = true;
+    private int hlekkurLife;
 
-    private boolean hlekkurSuperPowered = true;
+    private boolean alive;
 
-    private int hlekkurBattlePosition[] = {0,0,0,0,0,0,0,0};
+    private boolean superPowered;
 
-    private boolean hlekkurAttackFront = false;
+    private int standingPosition[] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-    private boolean hlekkurHarmed = false;
+    private int newStandingPosition;
 
-    private boolean hlekkurDefendFront = true;
+    private int oldStandingPositon;
 
-    private boolean hlekkurAttackRear = false;
+    private boolean attackFront;
 
-    private boolean hlekkurLeaveRight = false;
+    private boolean harmed;
 
-    private boolean hlekkurLeaveLeft = false;
+    private boolean defendFront;
 
-    private boolean hlekkurClimb = false;
+    private boolean attackRear;
 
-    private boolean hlekkurAscend = false;
+    private boolean leaveRight;
 
-    //TODO: create constructor
+    private boolean leaveLeft;
+
+    private boolean climb;
+
+    private boolean ascend;
+
+    public Hlekkur(int pos) {
+        FULL_LIFE = 6;
+        hlekkurLife = FULL_LIFE;
+        alive = true;
+        superPowered = true;
+        standingPosition[pos] = 1;
+        attackFront = false;
+        harmed = false;
+        defendFront = true;
+        attackRear = false;
+        leaveRight = false;
+        leaveLeft = false;
+        climb = false;
+        ascend = false;
+
+    }
 
     //TODO: create destructor
 
-    //TODO: create public set and get functions
+    public void setHarmToHlekkur(boolean harmed) {
+        if (harmed) {
+            this.hlekkurLife -= 1;
+        }
+    }
 
+    public int getStandingPosition() {
+        int num = 0;
+        for (int i = 0; i < 8; i++) {
+            if (this.standingPosition[i] == 1) {
+                break;
+            }
+            num += 1;
+        }
+        return num;
+    }
+
+    public void setStandingPosition(int pos) {
+        this.newStandingPosition = pos;
+        this.oldStandingPositon = this.getStandingPosition();
+        this.standingPosition[oldStandingPositon] = 0;
+        this.standingPosition[newStandingPosition] = 1;
+    }
+
+    public void toggleAttackandDefendTouch(boolean attack) {
+        this.attackFront = attack;
+    }
+
+    public boolean getAttackAndDefendState() {
+        return this.attackFront;
+    }
+
+    public void moveHlekkurRight(boolean b) {
+        //TODO, figure out move right
+    }
+
+    public void moveHlekkurLeft(boolean b) {
+        //TODO, figure out move left
+    }
+
+    public void setFullLife(int life) {
+        this.FULL_LIFE = life;
+    }
 
 }

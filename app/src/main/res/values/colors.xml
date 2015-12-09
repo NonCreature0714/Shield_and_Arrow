@@ -11,4 +11,10 @@
     <color name="white">#ffffff</color>
     <color name="pink">#ff7ef5</color>
     <color name="purple">#9900CC</color>
+    <color name="bloodRed">#bb4750</color>
+    <color name="orange">#de8e58</color>
+    <color name="yellow">#f5d850</color>
+    <color name="leafGreen">#7ea65d</color>
+    <color name="mountainBlack">#3d4335</color>
+    <color name="skyBlue">#679ae9</color>
 </resources>

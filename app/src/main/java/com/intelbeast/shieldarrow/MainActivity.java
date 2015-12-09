@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -60,4 +59,5 @@ public class MainActivity extends Activity implements OnClickListener {
         // Log the Configuration change.
         Log.d(TAG, "onConfigurationChanged " + newConfig.orientation);
     }
+
 }
