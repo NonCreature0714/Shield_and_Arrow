@@ -3,7 +3,7 @@ package com.intelbeast.shieldarrow;
 /**
  * Created by Bill on 11/23/15.
  */
-public class norn {
+public class Norn {
 
     private int nornLife = 4;
 
