@@ -163,11 +163,12 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
         Hlekkur hlekkur;
         Beinagrind[] beinagrind = new Beinagrind[8];
         Skrimsli skrimsli;
-        Norn norn;
         Platform platform;
         Gate gate;
         int atkID = 0;
         int atkGoing = 1;
+        private boolean battle = true;
+        private boolean hlekkurWon = false;
         private Paint background = new Paint();
         private Paint light = new Paint();
         private Paint greenish = new Paint();
@@ -204,6 +205,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
         private boolean hlekkurJustFiredArrow = false;
         private boolean hlekkurShieldFront = true;
         private boolean skrimsliShootArrow = false;
+
         //Dead or Alive States
         private boolean skrimsliAlive = true;
         private boolean hlekkurAlive = true;
@@ -213,6 +215,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
         private int skrimsliLife = SKRIMSLI_FULL_LIFE;
         private boolean skrimsliHarmed = false;
         private boolean hlekkurHarmed = false;
+
         //Win or lose states
         private boolean hlekkurWins = false;
         private boolean skrimsliWins = false;
@@ -221,6 +224,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
         private int posBeinagrind[] = {0, 0, 0, 0, 0, 0, 0, 0}; // for positions of Beinagrind.
         private float x;
         private float y;
+
         //Sounds
         private SoundPool soundPool;
         private int clickAttackButton = -1;
@@ -245,11 +249,32 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
         private int beinagrindMoveSound = -1;
         private int beinagrindAttackSound = -1;
         private double mLastTime;
+
         private double runningTimer;
+
+        private double beinagrindTime;
+
+        private double beinagrind5AttackTimer;
+
         private boolean skrimsliFired = false;
-/****************************
- *   Private functions      *
- ****************************/
+
+        private int numBeinagrind;
+
+        private boolean beinagrind5Appear = false;
+
+        private int beinagrind5AttackSwitch = 0;
+
+        private boolean beinagrind5Attacks = false;
+
+
+        //For beinagrind 8
+        private double beinagrind8AttackTimer;
+
+        private boolean beinagrind8Appear = false;
+
+        private int beinagrind8AttackSwitch = 0;
+
+        private boolean beinagrind8Attacks = false;
 
         /****************************
          * Public functions       *
@@ -275,134 +300,231 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
          *  life, etc.. It is called before draw.       *
          ************************************************/
         private void update() {
-            long now = System.currentTimeMillis();
-            if (mLastTime > now) {
-                return;
-            }
-            double elapsed = ((now - mLastTime) / 1000.0);
-            double mElapsedTime = (elapsed * 0.00000000001);
-            double mLastTime = now;
-            runningTimer += mElapsedTime;
+            if (battle) {
+                long now = System.currentTimeMillis();
 
 
-            // update hlekkur movements based on touch
-            if (hlekkurMoveRight && hlekkurX != 810) {
-                while (timesRight == 0) {
-                    hlekkurX += 100;
-                    timesRight += 1;
+                if (mLastTime > now) {
+                    return;
                 }
-            } else {
-                timesRight = 0;
-            }
+                double elapsed = ((now - mLastTime) / 1000.0);
+                double mElapsedTime = (elapsed * 0.00000000001);
+                double mLastTime = now;
+                runningTimer += mElapsedTime;
+                beinagrindTime += mElapsedTime;
+                beinagrind5AttackTimer += mElapsedTime;
+                beinagrind8AttackTimer += mElapsedTime;
 
 
-            if (hlekkurMoveLeft && hlekkurX != 110) {
-                while (timesLeft == 0) {
-                    hlekkurX -= 100;
-                    timesLeft += 1;
+                // update hlekkur movements based on touch
+                if (hlekkurMoveRight && hlekkurX != 810) {
+                    while (timesRight == 0) {
+                        hlekkurX += 100;
+                        timesRight += 1;
+                    }
+                } else {
+                    timesRight = 0;
                 }
-            } else {
-                timesLeft = 0;
+
+
+                if (hlekkurMoveLeft && hlekkurX != 110) {
+                    while (timesLeft == 0) {
+                        hlekkurX -= 100;
+                        timesLeft += 1;
+                    }
+                } else {
+                    timesLeft = 0;
+                }
+
+                //TODO: update hlekkur arrows if fired
+                if (hlekkurAttack && !hlekkurShootArrow) {
+                    hlekkurProjX = hlekkurX + 30;
+                    hlekkurShootArrow = true;
+                }
+
+                if (hlekkurAttack && hlekkurShootArrow) {
+                    hlekkurProjX += 15;
+                }
+
+                if (hlekkurProjX > 910) {
+                    hlekkurShootArrow = false;
+                    hlekkurAttack = false;
+                    skrimsliHarmed = true;
+                    hlekkurProjX = -40;
+                }
+
+                if (skrimsliHarmed) {
+                    skrimsliLife -= 1;
+                    skrimsliHarmed = false;
+                }
+
+                if (skrimsliLife == 0) {
+                    skrimsliAlive = false;
+                    hlekkurWon = true;
+                    //battle = false; // commented out for now to test animations
+                }
+
+                if (skrimsliAlive && runningTimer > 1) {
+                    skrimsliShootArrow = true;
+                    runningTimer = 0;
+                }
+
+                if (skrimsliShootArrow) {
+                    skrimsliShootArrow = false;
+                    skrimsliFired = true;
+                    skrimsliProjX = 910;
+                }
+
+                if (skrimsliFired && skrimsliProjX > hlekkurX + 42) {
+                    skrimsliProjX -= 15;
+                }
+
+                if (skrimsliFired && skrimsliProjX < hlekkurX + 40 && hlekkurShieldFront) {
+                    skrimsliFired = false;
+                    skrimsliProjX = 130;
+                }
+
+                if (skrimsliFired && skrimsliProjX < hlekkurX + 40 && !hlekkurShieldFront) {
+                    hlekkurHarmed = true;
+                    skrimsliFired = false;
+                    skrimsliProjX = 130;
+                }
+
+                if (hlekkurHarmed) {
+                    hlekkurHarmed = false;
+                    hlekkurLife -= 1;
+                }
+
+                if (hlekkurLife == 0) {
+                    hlekkurAlive = false;
+                    hlekkurWon = false;
+                    //battle = false; //commented out for now to test animations
+                }
+
+                if (beinagrindTime < 4) {
+                    beinagrind5AttackTimer = 0;
+                } else if (beinagrindTime > 4) {
+                    beinagrind5Appear = true;
+                    beinagrind5AttackTimer += mElapsedTime;
+                }
+
+                if (beinagrind5Appear) {
+                    if (beinagrind5AttackTimer < 0.5) {
+                        beinagrind5AttackSwitch = 0;
+                    }
+                    if (beinagrind5AttackTimer > 0.5 && beinagrind5AttackTimer < 1) {
+                        beinagrind5AttackSwitch = 1;
+                    }
+                    if (beinagrind5AttackTimer > 1 && beinagrind5AttackTimer < 1.5) {
+                        beinagrind5AttackSwitch = 2;
+                    }
+                    if (beinagrind5AttackTimer > 1.5 && beinagrind5AttackTimer < 2) {
+                        beinagrind5AttackSwitch = 3;
+                        beinagrind5Attacks = !hlekkurHarmed;
+                    }
+                    if (beinagrind5AttackTimer > 2 && beinagrind5AttackTimer < 2.5) {
+                        beinagrind5AttackSwitch = 2;
+                        beinagrind5Attacks = false;
+                    }
+                    if (beinagrind5AttackTimer > 2.5 && beinagrind5AttackTimer < 3) {
+                        beinagrind5AttackSwitch = 1;
+                    }
+                    if (beinagrind5AttackTimer > 3 && beinagrind5AttackTimer < 3.5) {
+                        beinagrind5AttackSwitch = 0;
+                    }
+                    if (beinagrind5AttackTimer > 3.5) {
+                        beinagrind5AttackTimer = 0;
+                    }
+                }
+                if (beinagrind5Attacks && hlekkurX == 510) {
+                    hlekkurHarmed = true;
+                }
+
+
+                //For beinagrind 8
+                if (beinagrindTime < 10) {
+                    beinagrind8AttackTimer = 0;
+                } else if (beinagrindTime > 10) {
+                    beinagrind8Appear = true;
+                    beinagrind8AttackTimer += mElapsedTime;
+                }
+
+
+                if (beinagrind8Appear) {
+                    if (beinagrind8AttackTimer < 0.5) {
+                        beinagrind8AttackSwitch = 0;
+                    }
+                    if (beinagrind8AttackTimer > 0.5 && beinagrind8AttackTimer < 1) {
+                        beinagrind8AttackSwitch = 1;
+                    }
+                    if (beinagrind8AttackTimer > 1 && beinagrind8AttackTimer < 1.5) {
+                        beinagrind8AttackSwitch = 2;
+                    }
+                    if (beinagrind8AttackTimer > 1.5 && beinagrind8AttackTimer < 2) {
+                        beinagrind8AttackSwitch = 3;
+                        beinagrind8Attacks = !hlekkurHarmed;
+                    }
+                    if (beinagrind8AttackTimer > 2 && beinagrind8AttackTimer < 2.5) {
+                        beinagrind8AttackSwitch = 2;
+                        beinagrind8Attacks = false;
+                    }
+                    if (beinagrind8AttackTimer > 2.5 && beinagrind8AttackTimer < 3) {
+                        beinagrind8AttackSwitch = 1;
+                    }
+                    if (beinagrind8AttackTimer > 3 && beinagrind8AttackTimer < 3.5) {
+                        beinagrind8AttackSwitch = 0;
+                    }
+                    if (beinagrind8AttackTimer > 3.5) {
+                        beinagrind8AttackTimer = 0;
+                    }
+                }
+                if (beinagrind8Attacks && hlekkurX == 810) {
+                    hlekkurHarmed = true;
+                }
+
+                //TODO: Update collision edges of Hlekkur
+
+                //TODO: Update collision edges of Skrimsli
+
+                //TODO: Update collision edges of Norn
+
+                //TODO: Update collision edges of Beinagrind(s)
+
+                //TODO: Shield detection Hlekkur
+
+                //TODO: Collision detection Hlekkur
+
+                //TODO: Collision detection Skrimsli
+
+
+                //TODO: Blunt force damage detection Hlekkur
+
+                //TODO: Blunt force damage detection Skrimsli
+
+                //TODO: Blunt force damage detection Norn
+
+
+                //TODO: Update Hlekkur health
+
+                //TODO: Update Skrimsli health
+
+                //TODO: Update Norn health
+
+
+                //TODO: Detect Hlekkur Victory/Defeat
+
+                //TODO: Detect Skrimsli Victory/Defeat
+
+                //TODO: Detect Norn Victory/Defeat
+
+
+            } else if (!battle && hlekkurWon) {
+                battle = true;
+            } else if (!battle && !hlekkurWon) {
+                battle = true;
             }
-
-            //TODO: update hlekkur arrows if fired
-            if (hlekkurAttack && !hlekkurShootArrow) {
-                hlekkurProjX = hlekkurX + 30;
-                hlekkurShootArrow = true;
-            }
-
-            if (hlekkurAttack && hlekkurShootArrow) {
-                hlekkurProjX += 15;
-            }
-
-            if (hlekkurProjX > 910) {
-                hlekkurShootArrow = false;
-                hlekkurAttack = false;
-                skrimsliHarmed = true;
-                hlekkurProjX = -40;
-            }
-
-            if (skrimsliHarmed) {
-                skrimsliLife -= 1;
-                skrimsliHarmed = false;
-            }
-
-            if (skrimsliLife == 0) {
-                skrimsliAlive = false;
-                hlekkurWins = true;
-            }
-
-            if (runningTimer > 1) {
-                skrimsliShootArrow = true;
-                runningTimer = 0;
-            }
-
-            if (skrimsliShootArrow) {
-                skrimsliShootArrow = false;
-                skrimsliFired = true;
-                skrimsliProjX = 910;
-            }
-
-            if (skrimsliFired && skrimsliProjX > hlekkurX + 40) {
-                skrimsliProjX -= 15;
-            }
-
-            if (skrimsliFired && skrimsliProjX < hlekkurX + 40 && hlekkurShieldFront) {
-                skrimsliFired = false;
-                skrimsliProjX = 130;
-            }
-
-            if (skrimsliFired && skrimsliProjX < hlekkurX + 40 && !hlekkurShieldFront) {
-                hlekkurHarmed = true;
-                skrimsliFired = false;
-                skrimsliProjX = 130;
-            }
-
-            if (hlekkurHarmed) {
-                hlekkurHarmed = false;
-                hlekkurLife -= 1;
-            }
-
-            if (hlekkurLife == 0) {
-                hlekkurAlive = false;
-                skrimsliWins = true;
-            }
-            //TODO: Update collision edges of Hlekkur
-
-            //TODO: Update collision edges of Skrimsli
-
-            //TODO: Update collision edges of Norn
-
-            //TODO: Update collision edges of Beinagrind(s)
-
-            //TODO: Shield detection Hlekkur
-
-            //TODO: Collision detection Hlekkur
-
-            //TODO: Collision detection Skrimsli
-
-
-            //TODO: Blunt force damage detection Hlekkur
-
-            //TODO: Blunt force damage detection Skrimsli
-
-            //TODO: Blunt force damage detection Norn
-
-
-            //TODO: Update Hlekkur health
-
-            //TODO: Update Skrimsli health
-
-            //TODO: Update Norn health
-
-
-            //TODO: Detect Hlekkur Victory/Defeat
-
-            //TODO: Detect Skrimsli Victory/Defeat
-
-            //TODO: Detect Norn Victory/Defeat
-
-
+        
+        
         }
 
         /************************************************
@@ -414,119 +536,165 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
             if (canvas == null) {
                 return;
             }
+            if (battle) {
 
-            // Create background.
-            canvas.drawRect(0, 0, getWidth(), getHeight(), mountainBlack);
-            //canvas.drawRect(0.5f, 0.5f, 0.5f, 0.5f, greenish);
+                // Create background.
+                canvas.drawRect(0, 0, getWidth(), getHeight(), mountainBlack);
+                //canvas.drawRect(0.5f, 0.5f, 0.5f, 0.5f, greenish);
 
-            //Colors
-            light.setColor(getResources().getColor(R.color.popBlue));  // should really get this from colors.xml
-            greenish.setColor(getResources().getColor(R.color.warmgreen));
-            white.setColor(getResources().getColor(R.color.white));
-            pink.setColor(getResources().getColor(R.color.pink));
-            purple.setColor(getResources().getColor(R.color.purple));
-            leafGreen.setColor(getResources().getColor(R.color.leafGreen));
-            red.setColor(getResources().getColor(R.color.bloodRed));
-            orange.setColor(getResources().getColor(R.color.orange));
-            yellow.setColor(getResources().getColor(R.color.yellow));
-
-
-            skyBlue.setColor(getResources().getColor(R.color.skyBlue));
+                //Colors
+                light.setColor(getResources().getColor(R.color.popBlue));  // should really get this from colors.xml
+                greenish.setColor(getResources().getColor(R.color.warmgreen));
+                white.setColor(getResources().getColor(R.color.white));
+                pink.setColor(getResources().getColor(R.color.pink));
+                purple.setColor(getResources().getColor(R.color.purple));
+                leafGreen.setColor(getResources().getColor(R.color.leafGreen));
+                red.setColor(getResources().getColor(R.color.bloodRed));
+                orange.setColor(getResources().getColor(R.color.orange));
+                yellow.setColor(getResources().getColor(R.color.yellow));
 
 
-            //TODO: draw 8 separat lines on the same line for Hlekkur
-            white.setStrokeWidth(10);
-            greenish.setStrokeWidth(10);
-            leafGreen.setStrokeWidth(10);
-            purple.setStrokeWidth(10);
-            canvas.drawLine(100 * width / 1000, 600 * height / 1000, 190 * width / 1000, 600 * height / 1000, greenish);
-            canvas.drawLine(200 * width / 1000, 600 * height / 1000, 290 * width / 1000, 600 * height / 1000, leafGreen);
-            canvas.drawLine(300 * width / 1000, 600 * height / 1000, 390 * width / 1000, 600 * height / 1000, greenish);
-            canvas.drawLine(400 * width / 1000, 600 * height / 1000, 490 * width / 1000, 600 * height / 1000, leafGreen);
-            canvas.drawLine(500 * width / 1000, 600 * height / 1000, 590 * width / 1000, 600 * height / 1000, greenish);
-            canvas.drawLine(600 * width / 1000, 600 * height / 1000, 690 * width / 1000, 600 * height / 1000, leafGreen);
-            canvas.drawLine(700 * width / 1000, 600 * height / 1000, 790 * width / 1000, 600 * height / 1000, greenish);
-            canvas.drawLine(800 * width / 1000, 600 * height / 1000, 890 * width / 1000, 600 * height / 1000, leafGreen);
+                skyBlue.setColor(getResources().getColor(R.color.skyBlue));
 
-            //2 platforms for Norn and Skrimsli
-            pink.setStrokeWidth(10);
-            canvas.drawLine(10 * width / 1000, 610 * height / 1000, 90 * width / 1000, 610 * height / 1000, purple);
-            canvas.drawLine(900 * width / 1000, 610 * height / 1000, 990 * width / 1000, 610 * height / 1000, purple);
 
-            red.setStrokeWidth(10);
+                //TODO: draw 8 separat lines on the same line for Hlekkur
+                white.setStrokeWidth(10);
+                greenish.setStrokeWidth(10);
+                leafGreen.setStrokeWidth(10);
+                purple.setStrokeWidth(10);
+                canvas.drawLine(100 * width / 1000, 600 * height / 1000, 190 * width / 1000, 600 * height / 1000, greenish);
+                canvas.drawLine(200 * width / 1000, 600 * height / 1000, 290 * width / 1000, 600 * height / 1000, leafGreen);
+                canvas.drawLine(300 * width / 1000, 600 * height / 1000, 390 * width / 1000, 600 * height / 1000, greenish);
+                canvas.drawLine(400 * width / 1000, 600 * height / 1000, 490 * width / 1000, 600 * height / 1000, leafGreen);
+                canvas.drawLine(500 * width / 1000, 600 * height / 1000, 590 * width / 1000, 600 * height / 1000, greenish);
+                canvas.drawLine(600 * width / 1000, 600 * height / 1000, 690 * width / 1000, 600 * height / 1000, leafGreen);
+                canvas.drawLine(700 * width / 1000, 600 * height / 1000, 790 * width / 1000, 600 * height / 1000, greenish);
+                canvas.drawLine(800 * width / 1000, 600 * height / 1000, 890 * width / 1000, 600 * height / 1000, leafGreen);
 
-            // Draw Hlekkur shapes
-            //Hlekkur
-            if (hlekkurAlive) {
-                canvas.drawRect((hlekkurX) * width / 1000, 460 * height / 1000, (hlekkurX + 70) * width / 1000, 585 * height / 1000, skyBlue);
+                //2 platforms for Norn and Skrimsli
+                pink.setStrokeWidth(10);
+                canvas.drawLine(10 * width / 1000, 610 * height / 1000, 90 * width / 1000, 610 * height / 1000, purple);
+                canvas.drawLine(10 * width / 1000, 650 * height / 1000, 50 * width / 1000, 610 * height / 1000, purple);
+                canvas.drawLine(900 * width / 1000, 610 * height / 1000, 990 * width / 1000, 610 * height / 1000, purple);
+                canvas.drawLine(950 * width / 1000, 610 * height / 1000, 990 * width / 1000, 650 * height / 1000, purple);
 
-                // Hlekkur projectile
-                if (hlekkurShootArrow) {
-                    canvas.drawRect((hlekkurProjX) * width / 1000, 480 * height / 1000, (hlekkurProjX + 30) * width / 1000, 510 * height / 1000, white);
+
+                red.setStrokeWidth(10);
+
+                // Draw Hlekkur shapes
+                //Hlekkur
+                if (hlekkurAlive) {
+                    canvas.drawRect((hlekkurX) * width / 1000, 460 * height / 1000, (hlekkurX + 70) * width / 1000, 585 * height / 1000, skyBlue);
+
+                    // Hlekkur projectile
+                    if (hlekkurShootArrow) {
+                        canvas.drawRect((hlekkurProjX) * width / 1000, 480 * height / 1000, (hlekkurProjX + 30) * width / 1000, 510 * height / 1000, white);
+                    }
+
+                    if (hlekkurShieldFront) {
+                        canvas.drawLine((hlekkurX + 75) * width / 1000, 470 * height / 1000, (hlekkurX + 75) * width / 1000, 575 * height / 1000, red);
+                    } else {
+                        canvas.drawLine((hlekkurX - 5) * width / 1000, 470 * height / 1000, (hlekkurX - 5) * width / 1000, 575 * height / 1000, red);
+                    }
+
                 }
 
-                if (hlekkurShieldFront) {
-                    canvas.drawLine((hlekkurX + 75) * width / 1000, 470 * height / 1000, (hlekkurX + 75) * width / 1000, 575 * height / 1000, red);
-                } else {
-                    canvas.drawLine((hlekkurX - 5) * width / 1000, 470 * height / 1000, (hlekkurX - 5) * width / 1000, 575 * height / 1000, red);
+                // Hlekkur life
+                int hlekkurFirstLife = 400;
+                for (int i = 0; i < hlekkurLife; i++) {
+                    canvas.drawRect(hlekkurFirstLife * width / 1000, 20 * height / 1000, (hlekkurFirstLife + 20) * width / 1000, 50 * height / 1000, red);
+                    hlekkurFirstLife += 25;
                 }
 
-            }
 
-            // Hlekkur life
-            int hlekkurFirstLife = 400;
-            for (int i = 0; i < hlekkurLife; i++) {
-                canvas.drawRect(hlekkurFirstLife * width / 1000, 20 * height / 1000, (hlekkurFirstLife + 20) * width / 1000, 50 * height / 1000, red);
-                hlekkurFirstLife += 25;
-            }
+                // TODO: Hlekkur sword
+
+                // TODO: Klekkur shield
 
 
-            // TODO: Hlekkur sword
+                //Draw Skrimsli shapes
+                if (skrimsliAlive) {
+                    if (!skrimsliHarmed) {
+                        canvas.drawRect(910 * width / 1000, 400 * height / 1000, 980 * width / 1000, 595 * height / 1000, orange);
+                    } else {
+                        canvas.drawRect(910 * width / 1000, 400 * height / 1000, 980 * width / 1000, 595 * height / 1000, yellow);
+                    }
 
-            // TODO: Klekkur shield
-
-
-            //Draw Skrimsli shapes
-            if (skrimsliAlive) {
-                if (!skrimsliHarmed) {
-                    canvas.drawRect(910 * width / 1000, 400 * height / 1000, 980 * width / 1000, 595 * height / 1000, orange);
-                } else {
-                    canvas.drawRect(910 * width / 1000, 400 * height / 1000, 980 * width / 1000, 595 * height / 1000, yellow);
                 }
 
+                // skrimsli projectile
+                if (skrimsliFired) {
+                    canvas.drawRect((skrimsliProjX) * width / 1000, 480 * height / 1000, (skrimsliProjX + 30) * width / 1000, 510 * height / 1000, yellow);
+                }
+
+
+                if (beinagrind5Appear) {
+                    switch (beinagrind5AttackSwitch) {
+                        case 0:
+                            canvas.drawRect(510 * width / 1000, 610 * height / 1000, 580 * width / 1000, 980 * height / 1000, white);
+                            break;
+                        case 1:
+                            canvas.drawRect(510 * width / 1000, 610 * height / 1000, 580 * width / 1000, 980 * height / 1000, yellow);
+                            break;
+                        case 2:
+                            canvas.drawRect(510 * width / 1000, 610 * height / 1000, 580 * width / 1000, 980 * height / 1000, orange);
+                            break;
+                        case 3:
+                            canvas.drawRect(510 * width / 1000, 610 * height / 1000, 580 * width / 1000, 980 * height / 1000, red);
+                    }
+
+                }
+
+                if (beinagrind8Appear) {
+                    switch (beinagrind8AttackSwitch) {
+                        case 0:
+                            canvas.drawRect(810 * width / 1000, 610 * height / 1000, 880 * width / 1000, 980 * height / 1000, white);
+                            break;
+                        case 1:
+                            canvas.drawRect(810 * width / 1000, 610 * height / 1000, 880 * width / 1000, 980 * height / 1000, yellow);
+                            break;
+                        case 2:
+                            canvas.drawRect(810 * width / 1000, 610 * height / 1000, 880 * width / 1000, 980 * height / 1000, orange);
+                            break;
+                        case 3:
+                            canvas.drawRect(810 * width / 1000, 610 * height / 1000, 880 * width / 1000, 980 * height / 1000, red);
+                    }
+
+                }
+                //Norn
+                //canvas.drawRect(20 * width / 1000, 410 * height / 1000, 80 * width / 1000, 575 * height / 1000, pink);
+
+                //TODO: draw placeholder for Norn projectile
+
+                //TODO: draw 8 placeholders for beinagrind
+
+
+                //TODO: font
+
+                //TODO: Detect gameSate;
+
+
+                //TODO: Upate Skrimsli dimensions
+
+                //TODO: Update Norn dimensions
+
+                //TODO: Update Beinagrind Positions
+
+                //TODO: draw Hlekkur
+
+                //TODO: draw Norn
+
+                //TODO: draw Beinagrind
+
+
+            } else if (!battle && hlekkurWon) {
+
+            } else if (!battle && !hlekkurWon) {
+
             }
-
-            // skrimsli projectile
-            if (skrimsliFired) {
-                canvas.drawRect((skrimsliProjX) * width / 1000, 480 * height / 1000, (skrimsliProjX + 30) * width / 1000, 510 * height / 1000, yellow);
-            }
-
-
-            //Norn
-            //canvas.drawRect(20 * width / 1000, 410 * height / 1000, 80 * width / 1000, 575 * height / 1000, pink);
-
-            //TODO: draw placeholder for Norn projectile
-
-            //TODO: draw 8 placeholders for beinagrind
-
-
-            //TODO: font
-
-            //TODO: Detect gameSate;
-
-
-            //TODO: Upate Skrimsli dimensions
-
-            //TODO: Update Norn dimensions
-
-            //TODO: Update Beinagrind Positions
-
-            //TODO: draw Hlekkur
-
-            //TODO: draw Norn
-
-            //TODO: draw Beinagrind
-
+            /************************************
+             *------ END OF DRAW FUNCTION-------*
+             ************************************/
         }
 
         public void initialize() {
