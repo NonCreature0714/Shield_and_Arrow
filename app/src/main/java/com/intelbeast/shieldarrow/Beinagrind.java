@@ -6,19 +6,31 @@ package com.intelbeast.shieldarrow;
 
 public class Beinagrind {
 
-    private boolean beinagrindAttack = false;
+    private boolean beinagrindAttack;
 
-    private int activeStandingPosition[] = {0,0,0,0,0,0,0,0};
+    private int positionBeinagrind;
 
-    private static int filledStandingPositions[] = {0,0,0,0,0,0,0,0};
+    private int attackPositionOfBeinagrind;
 
-    private int attackPosition = 0;
+    private int ATTACK = 4;
 
-    //TODO: create default constructor
+    public Beinagrind() {
+        beinagrindAttack = false;
+        attackPositionOfBeinagrind = 0;
+    }
 
     //TODO: create destructor
 
+
     //TODO: create public get and set functions
 
+    public void setPositionBeinagrind(int pos) {
+        positionBeinagrind = pos;
+    }
+
+    public void setAttackPositionOfBeinagrind(int atkPos) {
+        attackPositionOfBeinagrind = atkPos;
+        beinagrindAttack = attackPositionOfBeinagrind == ATTACK;
+    }
 
 }
