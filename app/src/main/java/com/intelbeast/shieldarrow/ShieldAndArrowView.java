@@ -15,7 +15,6 @@ import android.view.SurfaceView;
  * Created by Bill on 11/23/15.
  */
 
-
 public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Callback {
 
     private final ShieldAndArrowActivity gameActivity;
@@ -252,28 +251,28 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
 
         private double runningTimer;
 
+        private double hlekkurDamageTimer;
+        private int hlekkurHit;
+
         private double beinagrindTime;
 
-        private double beinagrind5AttackTimer;
+
 
         private boolean skrimsliFired = false;
 
         private int numBeinagrind;
 
+        //beinagrind 5
+        private double beinagrind5AttackTimer;
         private boolean beinagrind5Appear = false;
-
         private int beinagrind5AttackSwitch = 0;
-
         private boolean beinagrind5Attacks = false;
 
 
         //For beinagrind 8
         private double beinagrind8AttackTimer;
-
         private boolean beinagrind8Appear = false;
-
         private int beinagrind8AttackSwitch = 0;
-
         private boolean beinagrind8Attacks = false;
 
         /****************************
@@ -386,14 +385,27 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
 
                 if (skrimsliFired && skrimsliProjX < hlekkurX + 40 && !hlekkurShieldFront) {
                     hlekkurHarmed = true;
+                    hlekkurHit += 1;
                     skrimsliFired = false;
                     skrimsliProjX = 130;
                 }
 
                 if (hlekkurHarmed) {
-                    hlekkurHarmed = false;
-                    hlekkurLife -= 1;
+                    if (hlekkurHit == 1) {
+                        hlekkurHarmed = false;
+                        hlekkurLife -= 1;
+                        hlekkurDamageTimer = mElapsedTime;
+                    }
                 }
+
+                if (hlekkurDamageTimer > 0) {
+                    hlekkurDamageTimer += mElapsedTime;
+                    if (hlekkurDamageTimer > 0.5) {
+                        hlekkurHit = 0;
+                        hlekkurDamageTimer = 0;
+                    }
+                }
+
 
                 if (hlekkurLife == 0) {
                     hlekkurAlive = false;
@@ -401,9 +413,9 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
                     //battle = false; //commented out for now to test animations
                 }
 
-                if (beinagrindTime < 4) {
+                if (beinagrindTime < 3) {
                     beinagrind5AttackTimer = 0;
-                } else if (beinagrindTime > 4) {
+                } else if (beinagrindTime > 3) {
                     beinagrind5Appear = true;
                     beinagrind5AttackTimer += mElapsedTime;
                 }
@@ -420,7 +432,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
                     }
                     if (beinagrind5AttackTimer > 1.5 && beinagrind5AttackTimer < 2) {
                         beinagrind5AttackSwitch = 3;
-                        beinagrind5Attacks = !hlekkurHarmed;
+                        beinagrind5Attacks = true;
                     }
                     if (beinagrind5AttackTimer > 2 && beinagrind5AttackTimer < 2.5) {
                         beinagrind5AttackSwitch = 2;
@@ -438,6 +450,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
                 }
                 if (beinagrind5Attacks && hlekkurX == 510) {
                     hlekkurHarmed = true;
+                    hlekkurHit += 1;
                 }
 
 
@@ -462,7 +475,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
                     }
                     if (beinagrind8AttackTimer > 1.5 && beinagrind8AttackTimer < 2) {
                         beinagrind8AttackSwitch = 3;
-                        beinagrind8Attacks = !hlekkurHarmed;
+                        beinagrind8Attacks = true;
                     }
                     if (beinagrind8AttackTimer > 2 && beinagrind8AttackTimer < 2.5) {
                         beinagrind8AttackSwitch = 2;
@@ -480,6 +493,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
                 }
                 if (beinagrind8Attacks && hlekkurX == 810) {
                     hlekkurHarmed = true;
+                    hlekkurHit += 1;
                 }
 
                 //TODO: Update collision edges of Hlekkur
@@ -586,11 +600,12 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
                 if (hlekkurAlive) {
                     canvas.drawRect((hlekkurX) * width / 1000, 460 * height / 1000, (hlekkurX + 70) * width / 1000, 585 * height / 1000, skyBlue);
 
-                    // Hlekkur projectile
+                    // Hlekkur's arrow
                     if (hlekkurShootArrow) {
                         canvas.drawRect((hlekkurProjX) * width / 1000, 480 * height / 1000, (hlekkurProjX + 30) * width / 1000, 510 * height / 1000, white);
                     }
 
+                    // Hlekkur's shield
                     if (hlekkurShieldFront) {
                         canvas.drawLine((hlekkurX + 75) * width / 1000, 470 * height / 1000, (hlekkurX + 75) * width / 1000, 575 * height / 1000, red);
                     } else {
@@ -600,16 +615,16 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
                 }
 
                 // Hlekkur life
-                int hlekkurFirstLife = 400;
+                int hlekkurFirstLife = 100;
+                int hlekkurRowLife = 20;
                 for (int i = 0; i < hlekkurLife; i++) {
-                    canvas.drawRect(hlekkurFirstLife * width / 1000, 20 * height / 1000, (hlekkurFirstLife + 20) * width / 1000, 50 * height / 1000, red);
+                    canvas.drawRect(hlekkurFirstLife * width / 1000, hlekkurRowLife * height / 1000, (hlekkurFirstLife + 20) * width / 1000, (hlekkurRowLife + 30) * height / 1000, red);
                     hlekkurFirstLife += 25;
                 }
 
 
                 // TODO: Hlekkur sword
 
-                // TODO: Klekkur shield
 
 
                 //Draw Skrimsli shapes
@@ -622,7 +637,14 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
 
                 }
 
-                // skrimsli projectile
+                int skrimsliFirstLifeX = 950;
+                int skrimsliTopLifeY = 20;
+                for (int i = 0; i < skrimsliLife; i++) {
+                    canvas.drawRect(skrimsliFirstLifeX * width / 1000, skrimsliTopLifeY * height / 1000, (skrimsliFirstLifeX + 20) * width / 1000, (skrimsliTopLifeY + 30) * height / 1000, yellow);
+                    skrimsliTopLifeY += 37;
+                }
+
+                // skrimsli arrow
                 if (skrimsliFired) {
                     canvas.drawRect((skrimsliProjX) * width / 1000, 480 * height / 1000, (skrimsliProjX + 30) * width / 1000, 510 * height / 1000, yellow);
                 }
