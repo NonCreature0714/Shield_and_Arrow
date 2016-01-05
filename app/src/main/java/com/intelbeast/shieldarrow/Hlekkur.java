@@ -5,6 +5,22 @@ package com.intelbeast.shieldarrow;
  */
 public class Hlekkur {
 
+    //Positions
+    private int PLATFORM_1_POS = 110;
+    private int PLATFORM_2_POS = 210;
+    private int PLATFORM_3_POS = 310;
+    private int PLATFORM_4_POS = 410;
+    private int PLATFORM_5_POS = 510;
+    private int PLATFORM_6_POS = 610;
+    private int PLATFORM_7_POS = 710;
+    private int PLATFORM_8_POS = 810;
+
+    private int HLEKKUR_STANDING_OFFSET = 10;
+
+    private int hlekkurX;
+
+    private int hlekkurPlatformPos; //Will have a 1-8 value
+
     private int FULL_LIFE = 6;
 
     private int hlekkurLife;
@@ -15,11 +31,11 @@ public class Hlekkur {
 
     private int standingPosition[] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-    private int newStandingPosition;
-
-    private int oldStandingPositon;
-
     private boolean attackFront;
+
+    private boolean hlekkurMoveRight = false;
+
+    private boolean hlekkurMoveLeft = false;
 
     private boolean harmed;
 
@@ -60,7 +76,23 @@ public class Hlekkur {
         }
     }
 
-    public int getStandingPosition() {
+    public void setHlekkurMoveRight(boolean move){
+        hlekkurMoveRight = move;
+    }
+
+    public boolean getHlekkurMoveRightState(){
+        return hlekkurMoveRight;
+    }
+
+    public void setHlekkurMoveLeft(boolean move){
+        hlekkurMoveRight = move;
+    }
+
+    public boolean getHlekkurMoveLeftState(){
+        return hlekkurMoveLeft;
+    }
+
+    public int getHlekkurStandingPosition() {
         int num = 0;
         for (int i = 0; i < 8; i++) {
             if (this.standingPosition[i] == 1) {
@@ -71,11 +103,72 @@ public class Hlekkur {
         return num;
     }
 
-    public void setStandingPosition(int pos) {
-        this.newStandingPosition = pos;
-        this.oldStandingPositon = this.getStandingPosition();
-        this.standingPosition[oldStandingPositon] = 0;
-        this.standingPosition[newStandingPosition] = 1;
+    public void setHlekkurStandingPosition() {
+        if(hlekkurX == PLATFORM_1_POS){
+            for(int i=0; i<8;i++){
+                if(i==0){
+                    this.standingPosition[i]=1;
+                } else {
+                    this.standingPosition[i]=0;
+                }
+            }
+        } else if (hlekkurX == PLATFORM_2_POS){
+            for(int i=0; i<8;i++){
+                if(i==1){
+                    this.standingPosition[i]=1;
+                } else {
+                    this.standingPosition[i]=0;
+                }
+            }
+        } else if (hlekkurX == PLATFORM_3_POS){
+            for(int i=0; i<8;i++){
+                if(i==2){
+                    this.standingPosition[i]=1;
+                } else {
+                    this.standingPosition[i]=0;
+                }
+            }
+        } else if (hlekkurX == PLATFORM_4_POS){
+            for(int i=0; i<8;i++){
+                if(i==3){
+                    this.standingPosition[i]=1;
+                } else {
+                    this.standingPosition[i]=0;
+                }
+            }
+        } else if (hlekkurX == PLATFORM_5_POS){
+            for(int i=0; i<8;i++){
+                if(i==4){
+                    this.standingPosition[i]=1;
+                } else {
+                    this.standingPosition[i]=0;
+                }
+            }
+        } else if (hlekkurX == PLATFORM_6_POS){
+            for(int i=0; i<8;i++){
+                if(i==5){
+                    this.standingPosition[i]=1;
+                } else {
+                    this.standingPosition[i]=0;
+                }
+            }
+        } else if (hlekkurX == PLATFORM_7_POS){
+            for(int i=0; i<8;i++){
+                if(i==6){
+                    this.standingPosition[i]=1;
+                } else {
+                    this.standingPosition[i]=0;
+                }
+            }
+        } else if (hlekkurX == PLATFORM_8_POS){
+            for(int i=0; i<8;i++){
+                if(i==7){
+                    this.standingPosition[i]=1;
+                } else {
+                    this.standingPosition[i]=0;
+                }
+            }
+        }
     }
 
     public void toggleAttackandDefendTouch(boolean attack) {

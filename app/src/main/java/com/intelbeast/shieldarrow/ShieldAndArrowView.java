@@ -162,7 +162,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
         Hlekkur hlekkur;
         Beinagrind[] beinagrind = new Beinagrind[8];
         Skrimsli skrimsli;
-        Platform platform;
+        Platforms platforms;
         Gate gate;
         int atkID = 0;
         int atkGoing = 1;
@@ -306,6 +306,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
                 if (mLastTime > now) {
                     return;
                 }
+
                 double elapsed = ((now - mLastTime) / 1000.0);
                 double mElapsedTime = (elapsed * 0.00000000001);
                 double mLastTime = now;
@@ -345,6 +346,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
                     hlekkurProjX += 15;
                 }
 
+                // harming skrimsli
                 if (hlekkurProjX > 910) {
                     hlekkurShootArrow = false;
                     hlekkurAttack = false;
@@ -352,10 +354,12 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
                     hlekkurProjX = -40;
                 }
 
+
                 if (skrimsliHarmed) {
                     skrimsliLife -= 1;
                     skrimsliHarmed = false;
                 }
+
 
                 if (skrimsliLife == 0) {
                     skrimsliAlive = false;
