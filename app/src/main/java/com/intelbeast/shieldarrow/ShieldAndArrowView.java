@@ -112,38 +112,49 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
                 float xp = event.getX(ptrIdx) / width;
 
                 if (xp > 0.6) {
-                    _thread.hlekkurShieldFront = false;
+                    //_thread.hlekkurShieldFront = false;
+                    _thread.hlekkur.setHlekkurAttacks(true);
                 }
 
-                if (xp > 0.6 && !hlekkurAttacks) {
-                    hlekkurAttacks = true;
-                    _thread.attackandDefendToggle(true);
-                } else if (xp > 0.6 && hlekkurAttacks) {
-                    hlekkurAttacks = false;
-                    _thread.attackandDefendToggle(false);
-                } else if ((xp < 0.4 && xp > 0.2) && !hlekkurMovedRight) {
-                    hlekkurMovedRight = true;
-                    _thread.moveHlekkurRight(true);
-                } else if ((xp < 0.4 && xp > 0.2) && hlekkurMovedRight) {
-                    hlekkurMovedRight = false;
-                    _thread.moveHlekkurRight(false);
-                } else if (xp < 0.2 && !hlekkurMovedLeft) {
-                    hlekkurMovedLeft = true;
-                    _thread.moveHlekkurLeft(true);
-                } else if (xp < 0.2 && hlekkurMovedLeft) {
-                    hlekkurMovedLeft = false;
-                    _thread.moveHlekkurLeft(false);
+                if (xp > 0.6 && !_thread.hlekkur.getHlekkurAttacks()) {
+                     _thread.hlekkur.setHlekkurAttacks(true);
+                    //_thread.attackandDefendToggle(true);
+                    //_thread.hlekkur.toggleAttackAndDefendTouch(true);
+                } else if (xp > 0.6 && _thread.hlekkur.getHlekkurAttacks()) {
+                    //hlekkurAttacks = false;
+                    _thread.hlekkur.setHlekkurAttacks(false);
+                    //_thread.attackandDefendToggle(false);
+                } else if ((xp < 0.4 && xp > 0.2) && !_thread.hlekkur.getHlekkurMoveRight()) {
+                    //hlekkurMovedRight = true;
+                    _thread.hlekkur.setHlekkurMoveRight(true);
+                    //_thread.moveHlekkurRight(true);
+                } else if ((xp < 0.4 && xp > 0.2) && _thread.hlekkur.getHlekkurMoveRight()) {
+                    //hlekkurMovedRight = false;
+                    _thread.hlekkur.setHlekkurMoveRight(false);
+                    //_thread.moveHlekkurRight(false);
+                } else if (xp < 0.2 && !_thread.hlekkur.getHlekkurMoveLeft()) {
+                    //hlekkurMovedLeft = true;
+                    _thread.hlekkur.setHlekkurMoveLeft(true);
+                    //_thread.moveHlekkurLeft(true);
+                } else if (xp < 0.2 && _thread.hlekkur.getHlekkurMoveLeft()) {
+                    //hlekkurMovedLeft = false;
+                    _thread.hlekkur.setHlekkurMoveLeft(false);
+                    //_thread.moveHlekkurLeft(false);
                 }
                 ptrIdx++;
             }
         }
 
         if (touch == MotionEvent.ACTION_UP) {
-            _thread.moveHlekkurLeft(false);
-            _thread.moveHlekkurRight(false);
-            _thread.attackandDefendToggle(false);
+            //_thread.moveHlekkurLeft(false);
+            _thread.hlekkur.setHlekkurMoveLeft(false);
+            //_thread.moveHlekkurRight(false);
+            _thread.hlekkur.setHlekkurMoveRight(false);
+            //_thread.attackandDefendToggle(false);
+            _thread.hlekkur.toggleAttackAndDefendTouch(false);
             hlekkurAttacks = false;
-            _thread.hlekkurShieldFront = true;
+            //_thread.hlekkurShieldFront = true;
+            _thread.hlekkur.setHlekkurAttacks(false);
         }
 
 
@@ -164,6 +175,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
         Skrimsli skrimsli;
         Platforms platforms;
         Gate gate;
+        Animator animator;
         int atkID = 0;
         int atkGoing = 1;
         private boolean battle = true;
@@ -194,14 +206,11 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
         private boolean _run = false;
         private int timesRight = 0;
         private int timesLeft = 0;
-        private int timesAttack = 0;
         private boolean hlekkurMoveLeft = false;
         private boolean hlekkurMoveRight = false;
-        private int initialHlekkurArrowX = -30;
         private boolean hlekkurClimb = false;
         private boolean hlekkurAttack = false;
         private boolean hlekkurShootArrow = false;
-        private boolean hlekkurJustFiredArrow = false;
         private boolean hlekkurShieldFront = true;
         private boolean skrimsliShootArrow = false;
 
@@ -300,7 +309,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
          ************************************************/
         private void update() {
             if (battle) {
-                long now = System.currentTimeMillis();
+                /*long now = System.currentTimeMillis();
 
 
                 if (mLastTime > now) {
@@ -314,10 +323,13 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
                 beinagrindTime += mElapsedTime;
                 beinagrind5AttackTimer += mElapsedTime;
                 beinagrind8AttackTimer += mElapsedTime;
+                */
 
+                animator.updateTimer();
 
                 // update hlekkur movements based on touch
-                if (hlekkurMoveRight && hlekkurX != 810) {
+                //TODO stopped here in code revision, working on hlekkur object
+                if (hlekkur.getHlekkurMoveRight() && hlekkurX != 810) {
                     while (timesRight == 0) {
                         hlekkurX += 100;
                         timesRight += 1;
@@ -398,12 +410,12 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
                     if (hlekkurHit == 1) {
                         hlekkurHarmed = false;
                         hlekkurLife -= 1;
-                        hlekkurDamageTimer = mElapsedTime;
+                        hlekkurDamageTimer = animator.getmElapsedTime();
                     }
                 }
 
                 if (hlekkurDamageTimer > 0) {
-                    hlekkurDamageTimer += mElapsedTime;
+                    hlekkurDamageTimer += animator.getmElapsedTime();
                     if (hlekkurDamageTimer > 0.5) {
                         hlekkurHit = 0;
                         hlekkurDamageTimer = 0;
@@ -421,7 +433,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
                     beinagrind5AttackTimer = 0;
                 } else if (beinagrindTime > 3) {
                     beinagrind5Appear = true;
-                    beinagrind5AttackTimer += mElapsedTime;
+                    beinagrind5AttackTimer += animator.getmElapsedTime();
                 }
 
                 if (beinagrind5Appear) {
@@ -463,7 +475,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
                     beinagrind8AttackTimer = 0;
                 } else if (beinagrindTime > 10) {
                     beinagrind8Appear = true;
-                    beinagrind8AttackTimer += mElapsedTime;
+                    beinagrind8AttackTimer += animator.getmElapsedTime();
                 }
 
 
