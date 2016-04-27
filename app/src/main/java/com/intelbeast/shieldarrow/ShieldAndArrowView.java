@@ -17,15 +17,18 @@ import android.view.SurfaceView;
 
 public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Callback {
 
+    private static final String TAG = "ShieldAndArrowGameView";
+
     private final ShieldAndArrowActivity gameActivity;
     private ShieldAndArrowThread _thread;
     private boolean previouslyRunning = false;
     private int width;  //Screen width
     private int height; //Screen height
 
-    private int gameState;
+    //private int gameState;
 
     //Game states:
+    /*
     private boolean GAME_PAUSED = false;
     private int HLEKKUR_VICTORY = 11;
     private int HLEKKUR_DEFEAT = 12;
@@ -34,6 +37,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
     private int NORN_VICTORY = 31;
     private int NORN_DEFEAT = 32;
     private int BEINAGRIND_VICTORY = 41;
+    */
 
 
     private boolean newGame = true;
@@ -54,7 +58,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
 
         super.onSizeChanged(w, h, oldw, oldh);
 
-        //_thread.initialize();
+        //_thread.initialize(); //TODO figure out what to do with _thread.initialize in this block - has to do with changing orientation
     }
 
     @Override
@@ -64,7 +68,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
             _thread.initialize();
         }
 
-        _thread.setRunning(true);
+        _thread.setRunning(true); //TODO add some logic to this
         _thread.start();
         previouslyRunning = true;
     }
@@ -89,6 +93,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
             } catch (InterruptedException e) {
                 // will will try again and again
                 //TODO: what?
+                //TODO: research what are good ideas to test for in surfaceDestroyed
             }
         }
 
@@ -169,7 +174,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
 
     class ShieldAndArrowThread extends Thread {
 
-        //Heroes and enemies
+        //Heroes and enemies and other objects here
         Hlekkur hlekkur;
         Beinagrind[] beinagrind = new Beinagrind[8];
         Skrimsli skrimsli;
@@ -288,7 +293,7 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
          * Public functions       *
          ****************************/
 
-        public ShieldAndArrowThread(SurfaceHolder surfaceHolder, ShieldAndArrowView panel) {
+        public ShieldAndArrowThread(SurfaceHolder surfaceHolder, ShieldAndArrowView panel) { //This is the thread function - put the things you wish to initialize in the thread here
             _surfaceHolder = surfaceHolder;
             _panel = panel;
 
@@ -735,9 +740,10 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
              ************************************/
         }
 
-        public void initialize() {
+        public void initialize() { //Called when thread starts automatically (i think)
             hlekkurX = 310;
             beinagrind[3].setPositionBeinagrind(3);
+            //TODO - research other initial settings here
         }
 
         public void setRunning(boolean run) {
@@ -797,8 +803,9 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
         public void gamePause(boolean pause) {
             synchronized (_surfaceHolder) {
                 //TODO: has to be a certain value of yPos to work.
+                //TODO - complete 'gamePause' function
                 if (pause) {
-                    GAME_PAUSED = pause;
+                    //GAME_PAUSED = pause;
                 }
 
             }
@@ -817,19 +824,17 @@ public class ShieldAndArrowView extends SurfaceView implements SurfaceHolder.Cal
         }
 
         @Override
-        public void run() {
-            Canvas c;
+        public void run() { // run() is automatically called by callback
+            Canvas c; // Create canvas variable
             while (_run) {
-                c = null;
+                c = null; // Clear out canvas
                 try {
-                    c = _surfaceHolder.lockCanvas(null);
+                    c = _surfaceHolder.lockCanvas(null); //set canvas
                     synchronized (_surfaceHolder) {
 
-                        // Update the game state
-                        update();
+                        update();  // Update the game state
 
-                        // Draw image
-                        draw(c);
+                        draw(c); // Draw image
                     }
 
                 } finally {

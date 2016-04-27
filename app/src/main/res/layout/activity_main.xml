@@ -27,7 +27,8 @@
         android:layout_column="5"
         android:layout_gravity="center_horizontal"
         android:clickable="true"
-        android:text="Start" />
+        android:text="Start"
+        android:textAlignment="center" />
 
     <Button
         android:id="@+id/about_button"
